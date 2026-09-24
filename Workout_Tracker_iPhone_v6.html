@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f2f2f7">
+<title>Workout Tracker</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f2f7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:14px;border-bottom:1px solid #ddd;background:#f2f2f7}
+h1{font-size:25px;margin:0 0 12px}
+nav{display:flex;gap:8px}
+button{font:inherit;border:0;border-radius:12px;padding:11px 14px;background:#e5e5ea}
+.primary{background:#111;color:white;font-weight:600}
+main{max-width:650px;margin:auto;padding:14px 14px 80px}
+.card{background:white;border-radius:18px;padding:15px;margin-bottom:14px;box-shadow:0 1px 4px #0001}
+h2{font-size:19px;margin:0 0 12px}
+.date{display:flex;gap:8px} .date input{flex:1}
+.exercise{display:flex;gap:7px;align-items:center;padding:7px 0;border-bottom:1px solid #eee}
+.exercise:last-child{border-bottom:0}
+.moveButtons{width:43px;display:flex;flex-direction:column;gap:3px}
+.arrow{padding:5px 9px;border-radius:8px;font-size:15px}
+.exerciseButton{flex:1;text-align:left;background:white;padding:10px 8px}
+.exerciseButton strong{display:block;font-size:16px}
+.exerciseButton span{display:block;color:#666;font-size:13px;margin-top:3px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.small{font-size:13px;color:#666;line-height:1.4}
+.hidden{display:none}
+.modal{position:fixed;inset:0;background:#0007;z-index:50;display:flex;align-items:flex-end}
+.modal.hidden{display:none}
+.sheet{width:100%;background:white;border-radius:22px 22px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.sheetHead{display:flex;justify-content:space-between;align-items:center}
+.sheetHead h2{margin:0}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+input{font:inherit;border:1px solid #aaa;border-radius:10px;padding:11px;width:100%;margin-top:5px}
+.faces{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.face{padding:8px 2px;font-size:11px}
+.face span{font-size:25px;display:block}
+.face.selected{outline:3px solid #111}
+.record{padding:10px 0;border-bottom:1px solid #eee;line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+<h1>Workout Tracker</h1>
+<nav>
+<button id="workoutTab" class="primary" onclick="showWorkout()">Workout</button>
+<button id="historyTab" onclick="showHistory()">History</button>
+</nav>
+</header>
+
+<main>
+<section id="workout">
+<div class="card">
+<h2>Date</h2>
+<div class="date"><input id="date" type="date"><button onclick="setToday()">Today</button></div>
+</div>
+
+<div class="card">
+<h2>Exercises</h2>
+<div id="list">
+
+    <div class="exercise" id="ex0">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(0)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(0)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(0)">
+        <strong>Bench Crunch</strong>
+        <span id="summary0">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex1">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(1)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(1)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(1)">
+        <strong>Skull Crushers</strong>
+        <span id="summary1">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex2">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(2)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(2)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(2)">
+        <strong>BSS LEFT</strong>
+        <span id="summary2">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex3">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(3)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(3)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(3)">
+        <strong>S. PRESS</strong>
+        <span id="summary3">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex4">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(4)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(4)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(4)">
+        <strong>Push Up</strong>
+        <span id="summary4">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex5">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(5)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(5)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(5)">
+        <strong>Suitcase Squat</strong>
+        <span id="summary5">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex6">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(6)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(6)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(6)">
+        <strong>Incline Press</strong>
+        <span id="summary6">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex7">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(7)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(7)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(7)">
+        <strong>Hammer Curls</strong>
+        <span id="summary7">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex8">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(8)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(8)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(8)">
+        <strong>Row</strong>
+        <span id="summary8">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex9">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(9)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(9)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(9)">
+        <strong>Front squat</strong>
+        <span id="summary9">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex10">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(10)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(10)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(10)">
+        <strong>BSS Right</strong>
+        <span id="summary10">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex11">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(11)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(11)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(11)">
+        <strong>Crunch</strong>
+        <span id="summary11">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex12">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(12)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(12)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(12)">
+        <strong>Chest Press</strong>
+        <span id="summary12">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex13">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(13)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(13)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(13)">
+        <strong>Curls</strong>
+        <span id="summary13">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex14">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(14)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(14)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(14)">
+        <strong>Dips</strong>
+        <span id="summary14">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex15">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(15)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(15)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(15)">
+        <strong>Bench Dip</strong>
+        <span id="summary15">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex16">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(16)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(16)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(16)">
+        <strong>Renegade Row</strong>
+        <span id="summary16">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex17">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(17)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(17)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(17)">
+        <strong>Alternate R. Lunge</strong>
+        <span id="summary17">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex18">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(18)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(18)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(18)">
+        <strong>One Arm left</strong>
+        <span id="summary18">Tap to enter</span>
+      </button>
+    </div>
+    <div class="exercise" id="ex19">
+      <div class="moveButtons">
+        <button class="arrow" onclick="moveUp(19)" aria-label="Move up">↑</button>
+        <button class="arrow" onclick="moveDown(19)" aria-label="Move down">↓</button>
+      </div>
+      <button class="exerciseButton" onclick="openEntry(19)">
+        <strong>One Arm Right</strong>
+        <span id="summary19">Tap to enter</span>
+      </button>
+    </div>
+</div>
+<div class="actions">
+<button class="primary" onclick="saveAll()">Save Workout</button>
+</div>
+<p class="small">Tap an exercise to enter reps, weight and intensity. Use ↑ or ↓ to change its position.</p>
+<p id="status" class="small">Ready.</p>
+</div>
+</section>
+
+<section id="history" class="hidden">
+<div class="card">
+<h2>History</h2>
+<div id="historyList"></div>
+<div class="actions">
+<button onclick="backup()">Backup</button>
+<button onclick="restore()">Restore</button>
+</div>
+</div>
+</section>
+</main>
+
+<div id="modal" class="modal hidden">
+<div class="sheet">
+<div class="sheetHead">
+<h2 id="entryTitle"></h2>
+<button onclick="closeEntry()">✕</button>
+</div>
+<div class="form">
+<label>Reps<input id="reps" inputmode="decimal"></label>
+<label>Weight<input id="weight" inputmode="decimal"></label>
+</div>
+<p><strong>Intensity</strong></p>
+<div class="faces" id="faces"></div>
+<div class="actions">
+<button class="primary" onclick="saveEntry()">Save</button>
+<button onclick="clearEntry()">Clear</button>
+<button onclick="closeEntry()">Cancel</button>
+</div>
+</div>
+</div>
+
+<script>
+const NAMES = ["Bench Crunch", "Skull Crushers", "BSS LEFT", "S. PRESS", "Push Up", "Suitcase Squat", "Incline Press", "Hammer Curls", "Row", "Front squat", "BSS Right", "Crunch", "Chest Press", "Curls", "Dips", "Bench Dip", "Renegade Row", "Alternate R. Lunge", "One Arm left", "One Arm Right"];
+const FACES = [["🙂","Easy"],["😐","Moderate"],["😓","Hard"],["🤢","Very hard"],["🤮","Puke"]];
+const KEY="WORKOUT_V6";
+const ORDER_KEY="WORKOUT_ORDER_V6";
+let current={}, order=NAMES.slice(), active=-1, selected="";
+
+function getWorkouts() {
+  try { return JSON.parse(localStorage.getItem(KEY)||"{}"); } catch(e) { return {}; }
+}
+function putWorkouts(x) { localStorage.setItem(KEY,JSON.stringify(x)); }
+function getOrder() {
+  try {
+    const x=JSON.parse(localStorage.getItem(ORDER_KEY)||"null");
+    if(Array.isArray(x) && x.length===NAMES.length) return x;
+  } catch(e) {}
+  return NAMES.slice();
+}
+function saveOrder() { localStorage.setItem(ORDER_KEY,JSON.stringify(order)); }
+
+function setToday() {
+  const d=new Date();
+  date.value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  loadDay();
+}
+function loadDay() {
+  const all=getWorkouts();
+  current=all[date.value]||{};
+  updateSummaries();
+}
+function updateSummaries() {
+  NAMES.forEach((name,i)=> {
+    const x=current[name]||{};
+    document.getElementById("summary"+i).textContent =
+      (!x.reps&&!x.weight&&!x.intensity) ? "Tap to enter" :
+      (x.reps||"—")+" reps"+(x.weight?" • "+x.weight+" lb":"")+(x.intensity?" • "+x.intensity:"");
+  });
+}
+function openEntry(i) {
+  active=i;
+  const name=NAMES[i], x=current[name]||{};
+  entryTitle.textContent=name;
+  reps.value=x.reps||"";
+  weight.value=x.weight||"";
+  selected=x.intensity||"";
+  drawFaces();
+  modal.classList.remove("hidden");
+}
+function drawFaces() {
+  faces.innerHTML="";
+  FACES.forEach(([face,label])=> {
+    const b=document.createElement("button");
+    b.className="face"+(selected===face?" selected":"");
+    b.innerHTML="<span>"+face+"</span>"+label;
+    b.onclick=()=>{selected=face;drawFaces()};
+    faces.appendChild(b);
+  });
+}
+function saveEntry() {
+  current[NAMES[active]]={reps:reps.value.trim(),weight:weight.value.trim(),intensity:selected};
+  const all=getWorkouts();all[date.value]=current;putWorkouts(all);
+  closeEntry();updateSummaries();status.textContent="Saved ✓";
+}
+function clearEntry() {
+  delete current[NAMES[active]];
+  const all=getWorkouts();all[date.value]=current;putWorkouts(all);
+  closeEntry();updateSummaries();
+}
+function closeEntry() { modal.classList.add("hidden"); }
+function saveAll() {
+  const all=getWorkouts();all[date.value]=current;putWorkouts(all);
+  status.textContent="Workout saved ✓";
+}
+function moveUp(i) {
+  if(i<=0)return;
+  const a=order.indexOf(NAMES[i]);
+  const b=order.indexOf(NAMES[i-1]);
+  if(a<0||b<0)return;
+  [order[a],order[b]]=[order[b],order[a]];
+  saveOrder();applyOrder();status.textContent="Order saved ✓";
+}
+function moveDown(i) {
+  if(i>=NAMES.length-1)return;
+  const a=order.indexOf(NAMES[i]);
+  const b=order.indexOf(NAMES[i+1]);
+  if(a<0||b<0)return;
+  [order[a],order[b]]=[order[b],order[a]];
+  saveOrder();applyOrder();status.textContent="Order saved ✓";
+}
+function applyOrder() {
+  const list=document.getElementById("list");
+  order.forEach(name=> {
+    const i=NAMES.indexOf(name);
+    const el=document.getElementById("ex"+i);
+    if(el)list.appendChild(el);
+  });
+}
+function showWorkout() {
+  workout.classList.remove("hidden");history.classList.add("hidden");
+  workoutTab.className="primary";historyTab.className="";
+}
+function showHistory() {
+  workout.classList.add("hidden");history.classList.remove("hidden");
+  workoutTab.className="";historyTab.className="primary";
+  renderHistory();
+}
+function renderHistory() {
+  const box=historyList,all=getWorkouts(),dates=Object.keys(all).sort().reverse();
+  box.innerHTML="";
+  if(!dates.length){box.innerHTML='<p class="small">No saved workouts yet.</p>';return;}
+  dates.forEach(dt=> {
+    const r=document.createElement("div");r.className="record";
+    const strong=document.createElement("strong");strong.textContent=dt;r.appendChild(strong);
+    Object.entries(all[dt]||{}).forEach(([name,x])=> {
+      const d=document.createElement("div");
+      d.textContent=name+" — "+(x.reps||"—")+" reps"+(x.weight?" • "+x.weight+" lb":"")+(x.intensity?" • "+x.intensity:"");
+      r.appendChild(d);
+    });
+    box.appendChild(r);
+  });
+}
+function backup() {
+  const payload={order,workouts:getWorkouts()};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Workout_Tracker_Backup.json";a.click();
+}
+function restore() {
+  const input=document.createElement("input");input.type="file";input.accept=".json";
+  input.onchange=()=> {
+    const r=new FileReader();
+    r.onload=()=>{try {
+      const p=JSON.parse(r.result);
+      order=p.order||NAMES.slice();putWorkouts(p.workouts||{});saveOrder();applyOrder();loadDay();alert("Restored.");
+    } catch(e) {alert("Backup could not be read.");}};
+    r.readAsText(input.files[0]);
+  };
+  input.click();
+}
+
+order=getOrder();
+applyOrder();
+setToday();
+date.addEventListener("change",loadDay);
+modal.addEventListener("click",e=>{if(e.target===modal)closeEntry();});
+</script>
+</body>
+</html>
